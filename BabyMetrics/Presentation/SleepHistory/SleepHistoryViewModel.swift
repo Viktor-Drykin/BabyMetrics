@@ -60,13 +60,15 @@ final class SleepHistoryViewModel: ObservableObject {
         case .all:
             return entries
         case .today:
-            return entries.filter { calendar.isDate($0.startDate, inSameDayAs: now) }
+            let startOfDay = calendar.startOfDay(for: now)
+            let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+            return entries.filter { $0.startDate < endOfDay && $0.endDate > startOfDay }
         case .week:
             guard let interval = calendar.dateInterval(of: .weekOfYear, for: now) else { return entries }
-            return entries.filter { interval.contains($0.startDate) }
+            return entries.filter { $0.startDate < interval.end && $0.endDate > interval.start }
         case .month:
             guard let interval = calendar.dateInterval(of: .month, for: now) else { return entries }
-            return entries.filter { interval.contains($0.startDate) }
+            return entries.filter { $0.startDate < interval.end && $0.endDate > interval.start }
         }
     }
 
@@ -75,8 +77,14 @@ final class SleepHistoryViewModel: ObservableObject {
         var grouped: [Date: Double] = [:]
 
         for entry in filteredEntries {
-            let bucketDate = calendar.startOfDay(for: entry.startDate)
-            grouped[bucketDate, default: 0] += entry.duration / 3600.0
+            var segmentStart = entry.startDate
+            while segmentStart < entry.endDate {
+                let dayStart = calendar.startOfDay(for: segmentStart)
+                let nextMidnight = calendar.date(byAdding: .day, value: 1, to: dayStart)!
+                let segmentEnd = min(entry.endDate, nextMidnight)
+                grouped[dayStart, default: 0] += segmentEnd.timeIntervalSince(segmentStart) / 3600.0
+                segmentStart = segmentEnd
+            }
         }
 
         return grouped

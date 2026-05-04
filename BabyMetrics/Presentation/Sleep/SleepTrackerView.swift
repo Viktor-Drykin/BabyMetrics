@@ -3,15 +3,34 @@ import SwiftUI
 struct SleepTrackerView: View {
     @StateObject var viewModel: SleepTrackerViewModel
     @State private var selectedTime: Date = Date()
+    @State private var userSelectedTime: Date? = nil
     @State private var isActionButtonDisabled = false
+    @State private var showWakeTimeError = false
 
-    private let formatter: DateFormatter = {
+    private let timeFormatter: DateFormatter = {
         let f = DateFormatter()
         f.locale = Locale(identifier: "uk_UA")
         f.dateStyle = .none
         f.timeStyle = .short
         return f
     }()
+
+    private let dateTimeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "uk_UA")
+        f.setLocalizedDateFormatFromTemplate("d MMM, HH:mm")
+        return f
+    }()
+
+    private var pickerBinding: Binding<Date> {
+        Binding(
+            get: { selectedTime },
+            set: { newValue in
+                selectedTime = newValue
+                userSelectedTime = newValue
+            }
+        )
+    }
 
     var body: some View {
         NavigationStack {
@@ -21,7 +40,7 @@ struct SleepTrackerView: View {
                         Text("Дитина спить")
                             .font(.title2.weight(.semibold))
 
-                        Text("Початок: \(formatter.string(from: startDate))")
+                        Text("Початок: \(startDateString(from: startDate))")
                             .foregroundStyle(.secondary)
 
                         TimelineView(.periodic(from: Date(), by: 60)) { timeline in
@@ -33,7 +52,7 @@ struct SleepTrackerView: View {
 
                         DatePicker(
                             "Прокинувся о",
-                            selection: $selectedTime,
+                            selection: pickerBinding,
                             in: startDate...Date(),
                             displayedComponents: [.date, .hourAndMinute]
                         )
@@ -62,7 +81,7 @@ struct SleepTrackerView: View {
 
                         DatePicker(
                             "Заснув о",
-                            selection: $selectedTime,
+                            selection: pickerBinding,
                             in: ...Date(),
                             displayedComponents: [.date, .hourAndMinute]
                         )
@@ -79,17 +98,29 @@ struct SleepTrackerView: View {
             .padding()
             .navigationTitle("Сон")
             .background(AppTheme.warmBackground.ignoresSafeArea())
+            .alert("Невірний час пробудження", isPresented: $showWakeTimeError) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Час пробудження має бути пізніше початку сну.")
+            }
             .onChange(of: viewModel.isSleeping) { _, _ in
                 selectedTime = Date()
+                userSelectedTime = nil
             }
             .safeAreaInset(edge: .bottom) {
                 Button {
                     isActionButtonDisabled = true
 
                     if viewModel.isSleeping {
-                        viewModel.stopSleep(at: selectedTime)
+                        let time = userSelectedTime ?? Date()
+                        guard let start = viewModel.activeSleepStart, time > start else {
+                            showWakeTimeError = true
+                            isActionButtonDisabled = false
+                            return
+                        }
+                        viewModel.stopSleep(at: time)
                     } else {
-                        viewModel.startSleep(at: selectedTime)
+                        viewModel.startSleep(at: userSelectedTime ?? Date())
                     }
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -112,5 +143,11 @@ struct SleepTrackerView: View {
                 .padding(.bottom, 60)
             }
         }
+    }
+
+    private func startDateString(from date: Date) -> String {
+        Calendar.current.isDateInToday(date)
+            ? timeFormatter.string(from: date)
+            : dateTimeFormatter.string(from: date)
     }
 }

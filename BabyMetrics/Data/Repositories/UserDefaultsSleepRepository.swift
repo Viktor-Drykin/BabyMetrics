@@ -49,6 +49,7 @@ final class UserDefaultsSleepRepository: ObservableObject, SleepRepository {
     func stopSleep(at date: Date) {
         guard let startDate = activeSleepStart else { return }
         let endDate = max(date, startDate)
+        guard endDate > startDate else { return }
         let entry = SleepEntry(id: UUID(), startDate: startDate, endDate: endDate)
         entries.insert(entry, at: 0)
         entries.sort { $0.startDate > $1.startDate }

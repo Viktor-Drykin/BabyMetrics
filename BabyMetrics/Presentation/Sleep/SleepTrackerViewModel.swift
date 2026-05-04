@@ -34,7 +34,7 @@ final class SleepTrackerViewModel: ObservableObject {
     }
 
     var latestWakeDate: Date? {
-        entries.map(\.endDate).max()
+        entries.filter { $0.endDate <= Date() }.map(\.endDate).max()
     }
 
     func startSleep(at date: Date) {

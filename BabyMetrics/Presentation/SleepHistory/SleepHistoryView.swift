@@ -237,6 +237,7 @@ struct EditSleepEntryView: View {
 
     @State private var startDate: Date
     @State private var endDate: Date
+    @State private var showValidationAlert = false
 
     init(viewModel: SleepHistoryViewModel, entry: SleepEntry) {
         self.viewModel = viewModel
@@ -251,11 +252,20 @@ struct EditSleepEntryView: View {
             DatePicker("Кінець", selection: $endDate)
 
             Button("Зберегти зміни") {
+                guard endDate > startDate else {
+                    showValidationAlert = true
+                    return
+                }
                 viewModel.updateEntry(id: entry.id, startDate: startDate, endDate: endDate)
                 dismiss()
             }
             .frame(maxWidth: .infinity, alignment: .center)
         }
         .navigationTitle("Редагування")
+        .alert("Невірні дані", isPresented: $showValidationAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Час закінчення має бути пізніше часу початку.")
+        }
     }
 }
