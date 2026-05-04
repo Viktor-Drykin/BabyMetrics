@@ -12,37 +12,37 @@
 			containerPortal = C01B59932F6D42A4008418A5 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = C01B599A2F6D42A4008418A5;
-			remoteInfo = BreastFeeding;
+			remoteInfo = BabyMetrics;
 		};
 		C01B59B32F6D42A6008418A5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C01B59932F6D42A4008418A5 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = C01B599A2F6D42A4008418A5;
-			remoteInfo = BreastFeeding;
+			remoteInfo = BabyMetrics;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		C01B599B2F6D42A4008418A5 /* BreastFeeding.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BreastFeeding.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		C01B59A82F6D42A6008418A5 /* BreastFeedingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BreastFeedingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		C01B59B22F6D42A6008418A5 /* BreastFeedingUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BreastFeedingUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C01B599B2F6D42A4008418A5 /* BabyMetrics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BabyMetrics.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C01B59A82F6D42A6008418A5 /* BabyMetricsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BabyMetricsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C01B59B22F6D42A6008418A5 /* BabyMetricsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BabyMetricsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		C01B599D2F6D42A4008418A5 /* BreastFeeding */ = {
+		C01B599D2F6D42A4008418A5 /* BabyMetrics */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = BreastFeeding;
+			path = BabyMetrics;
 			sourceTree = "<group>";
 		};
-		C01B59AB2F6D42A6008418A5 /* BreastFeedingTests */ = {
+		C01B59AB2F6D42A6008418A5 /* BabyMetricsTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = BreastFeedingTests;
+			path = BabyMetricsTests;
 			sourceTree = "<group>";
 		};
-		C01B59B52F6D42A6008418A5 /* BreastFeedingUITests */ = {
+		C01B59B52F6D42A6008418A5 /* BabyMetricsUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = BreastFeedingUITests;
+			path = BabyMetricsUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,9 +75,9 @@
 		C01B59922F6D42A4008418A5 = {
 			isa = PBXGroup;
 			children = (
-				C01B599D2F6D42A4008418A5 /* BreastFeeding */,
-				C01B59AB2F6D42A6008418A5 /* BreastFeedingTests */,
-				C01B59B52F6D42A6008418A5 /* BreastFeedingUITests */,
+				C01B599D2F6D42A4008418A5 /* BabyMetrics */,
+				C01B59AB2F6D42A6008418A5 /* BabyMetricsTests */,
+				C01B59B52F6D42A6008418A5 /* BabyMetricsUITests */,
 				C01B599C2F6D42A4008418A5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -85,9 +85,9 @@
 		C01B599C2F6D42A4008418A5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C01B599B2F6D42A4008418A5 /* BreastFeeding.app */,
-				C01B59A82F6D42A6008418A5 /* BreastFeedingTests.xctest */,
-				C01B59B22F6D42A6008418A5 /* BreastFeedingUITests.xctest */,
+				C01B599B2F6D42A4008418A5 /* BabyMetrics.app */,
+				C01B59A82F6D42A6008418A5 /* BabyMetricsTests.xctest */,
+				C01B59B22F6D42A6008418A5 /* BabyMetricsUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,9 +95,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C01B599A2F6D42A4008418A5 /* BreastFeeding */ = {
+		C01B599A2F6D42A4008418A5 /* BabyMetrics */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C01B59BC2F6D42A6008418A5 /* Build configuration list for PBXNativeTarget "BreastFeeding" */;
+			buildConfigurationList = C01B59BC2F6D42A6008418A5 /* Build configuration list for PBXNativeTarget "BabyMetrics" */;
 			buildPhases = (
 				C01B59972F6D42A4008418A5 /* Sources */,
 				C01B59982F6D42A4008418A5 /* Frameworks */,
@@ -108,18 +108,18 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				C01B599D2F6D42A4008418A5 /* BreastFeeding */,
+				C01B599D2F6D42A4008418A5 /* BabyMetrics */,
 			);
-			name = BreastFeeding;
+			name = BabyMetrics;
 			packageProductDependencies = (
 			);
-			productName = BreastFeeding;
-			productReference = C01B599B2F6D42A4008418A5 /* BreastFeeding.app */;
+			productName = BabyMetrics;
+			productReference = C01B599B2F6D42A4008418A5 /* BabyMetrics.app */;
 			productType = "com.apple.product-type.application";
 		};
-		C01B59A72F6D42A6008418A5 /* BreastFeedingTests */ = {
+		C01B59A72F6D42A6008418A5 /* BabyMetricsTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C01B59BF2F6D42A6008418A5 /* Build configuration list for PBXNativeTarget "BreastFeedingTests" */;
+			buildConfigurationList = C01B59BF2F6D42A6008418A5 /* Build configuration list for PBXNativeTarget "BabyMetricsTests" */;
 			buildPhases = (
 				C01B59A42F6D42A6008418A5 /* Sources */,
 				C01B59A52F6D42A6008418A5 /* Frameworks */,
@@ -131,18 +131,18 @@
 				C01B59AA2F6D42A6008418A5 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				C01B59AB2F6D42A6008418A5 /* BreastFeedingTests */,
+				C01B59AB2F6D42A6008418A5 /* BabyMetricsTests */,
 			);
-			name = BreastFeedingTests;
+			name = BabyMetricsTests;
 			packageProductDependencies = (
 			);
-			productName = BreastFeedingTests;
-			productReference = C01B59A82F6D42A6008418A5 /* BreastFeedingTests.xctest */;
+			productName = BabyMetricsTests;
+			productReference = C01B59A82F6D42A6008418A5 /* BabyMetricsTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		C01B59B12F6D42A6008418A5 /* BreastFeedingUITests */ = {
+		C01B59B12F6D42A6008418A5 /* BabyMetricsUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C01B59C22F6D42A6008418A5 /* Build configuration list for PBXNativeTarget "BreastFeedingUITests" */;
+			buildConfigurationList = C01B59C22F6D42A6008418A5 /* Build configuration list for PBXNativeTarget "BabyMetricsUITests" */;
 			buildPhases = (
 				C01B59AE2F6D42A6008418A5 /* Sources */,
 				C01B59AF2F6D42A6008418A5 /* Frameworks */,
@@ -154,13 +154,13 @@
 				C01B59B42F6D42A6008418A5 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				C01B59B52F6D42A6008418A5 /* BreastFeedingUITests */,
+				C01B59B52F6D42A6008418A5 /* BabyMetricsUITests */,
 			);
-			name = BreastFeedingUITests;
+			name = BabyMetricsUITests;
 			packageProductDependencies = (
 			);
-			productName = BreastFeedingUITests;
-			productReference = C01B59B22F6D42A6008418A5 /* BreastFeedingUITests.xctest */;
+			productName = BabyMetricsUITests;
+			productReference = C01B59B22F6D42A6008418A5 /* BabyMetricsUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -186,7 +186,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C01B59962F6D42A4008418A5 /* Build configuration list for PBXProject "BreastFeeding" */;
+			buildConfigurationList = C01B59962F6D42A4008418A5 /* Build configuration list for PBXProject "BabyMetrics" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -200,9 +200,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C01B599A2F6D42A4008418A5 /* BreastFeeding */,
-				C01B59A72F6D42A6008418A5 /* BreastFeedingTests */,
-				C01B59B12F6D42A6008418A5 /* BreastFeedingUITests */,
+				C01B599A2F6D42A4008418A5 /* BabyMetrics */,
+				C01B59A72F6D42A6008418A5 /* BabyMetricsTests */,
+				C01B59B12F6D42A6008418A5 /* BabyMetricsUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -258,12 +258,12 @@
 /* Begin PBXTargetDependency section */
 		C01B59AA2F6D42A6008418A5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C01B599A2F6D42A4008418A5 /* BreastFeeding */;
+			target = C01B599A2F6D42A4008418A5 /* BabyMetrics */;
 			targetProxy = C01B59A92F6D42A6008418A5 /* PBXContainerItemProxy */;
 		};
 		C01B59B42F6D42A6008418A5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C01B599A2F6D42A4008418A5 /* BreastFeeding */;
+			target = C01B599A2F6D42A4008418A5 /* BabyMetrics */;
 			targetProxy = C01B59B32F6D42A6008418A5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -398,6 +398,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Baby Metrics";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -413,7 +414,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.7;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "breastfeeding-.viktor.com.BreastFeeding";
+				PRODUCT_BUNDLE_IDENTIFIER = "breastfeeding-.viktor.com.BabyMetrics";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -442,6 +443,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Baby Metrics";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -457,7 +459,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.7;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "breastfeeding-.viktor.com.BreastFeeding";
+				PRODUCT_BUNDLE_IDENTIFIER = "breastfeeding-.viktor.com.BabyMetrics";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -484,7 +486,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MACOSX_DEPLOYMENT_TARGET = 15.7;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "breastfeeding-.viktor.com.BreastFeedingTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "breastfeeding-.viktor.com.BabyMetricsTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -494,7 +496,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BreastFeeding.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BreastFeeding";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BabyMetrics.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BabyMetrics";
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
@@ -510,7 +512,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MACOSX_DEPLOYMENT_TARGET = 15.7;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "breastfeeding-.viktor.com.BreastFeedingTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "breastfeeding-.viktor.com.BabyMetricsTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -520,7 +522,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BreastFeeding.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BreastFeeding";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BabyMetrics.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BabyMetrics";
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
@@ -535,7 +537,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MACOSX_DEPLOYMENT_TARGET = 15.7;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "breastfeeding-.viktor.com.BreastFeedingUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "breastfeeding-.viktor.com.BabyMetricsUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -545,7 +547,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = BreastFeeding;
+				TEST_TARGET_NAME = BabyMetrics;
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
@@ -560,7 +562,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				MACOSX_DEPLOYMENT_TARGET = 15.7;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "breastfeeding-.viktor.com.BreastFeedingUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "breastfeeding-.viktor.com.BabyMetricsUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -570,7 +572,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = BreastFeeding;
+				TEST_TARGET_NAME = BabyMetrics;
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
@@ -578,7 +580,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C01B59962F6D42A4008418A5 /* Build configuration list for PBXProject "BreastFeeding" */ = {
+		C01B59962F6D42A4008418A5 /* Build configuration list for PBXProject "BabyMetrics" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01B59BA2F6D42A6008418A5 /* Debug */,
@@ -587,7 +589,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C01B59BC2F6D42A6008418A5 /* Build configuration list for PBXNativeTarget "BreastFeeding" */ = {
+		C01B59BC2F6D42A6008418A5 /* Build configuration list for PBXNativeTarget "BabyMetrics" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01B59BD2F6D42A6008418A5 /* Debug */,
@@ -596,7 +598,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C01B59BF2F6D42A6008418A5 /* Build configuration list for PBXNativeTarget "BreastFeedingTests" */ = {
+		C01B59BF2F6D42A6008418A5 /* Build configuration list for PBXNativeTarget "BabyMetricsTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01B59C02F6D42A6008418A5 /* Debug */,
@@ -605,7 +607,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C01B59C22F6D42A6008418A5 /* Build configuration list for PBXNativeTarget "BreastFeedingUITests" */ = {
+		C01B59C22F6D42A6008418A5 /* Build configuration list for PBXNativeTarget "BabyMetricsUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01B59C32F6D42A6008418A5 /* Debug */,

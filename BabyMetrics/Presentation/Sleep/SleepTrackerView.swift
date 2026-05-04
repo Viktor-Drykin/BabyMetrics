@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SleepTrackerView: View {
     @StateObject var viewModel: SleepTrackerViewModel
+    @State private var selectedTime: Date = Date()
     @State private var isActionButtonDisabled = false
 
     private let formatter: DateFormatter = {
@@ -16,7 +17,7 @@ struct SleepTrackerView: View {
         NavigationStack {
             VStack(spacing: 20) {
                 if let startDate = viewModel.activeSleepStart {
-                    VStack(spacing: 8) {
+                    VStack(spacing: 12) {
                         Text("Дитина спить")
                             .font(.title2.weight(.semibold))
 
@@ -27,13 +28,23 @@ struct SleepTrackerView: View {
                             Text(viewModel.durationString(from: startDate, to: timeline.date))
                                 .font(.title3.weight(.bold))
                         }
+
+                        Divider()
+
+                        DatePicker(
+                            "Прокинувся о",
+                            selection: $selectedTime,
+                            in: startDate...Date(),
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
+                        .environment(\.locale, Locale(identifier: "uk_UA"))
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color(.secondarySystemBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 } else {
-                    VStack(spacing: 8) {
+                    VStack(spacing: 12) {
                         Text("Дитина не спить")
                             .font(.title2.weight(.semibold))
 
@@ -46,6 +57,16 @@ struct SleepTrackerView: View {
                             Text("Ще немає завершених снів")
                                 .foregroundStyle(.secondary)
                         }
+
+                        Divider()
+
+                        DatePicker(
+                            "Заснув о",
+                            selection: $selectedTime,
+                            in: ...Date(),
+                            displayedComponents: [.date, .hourAndMinute]
+                        )
+                        .environment(\.locale, Locale(identifier: "uk_UA"))
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -58,14 +79,17 @@ struct SleepTrackerView: View {
             .padding()
             .navigationTitle("Сон")
             .background(AppTheme.warmBackground.ignoresSafeArea())
+            .onChange(of: viewModel.isSleeping) { _, _ in
+                selectedTime = Date()
+            }
             .safeAreaInset(edge: .bottom) {
                 Button {
                     isActionButtonDisabled = true
 
                     if viewModel.isSleeping {
-                        viewModel.stopSleepNow()
+                        viewModel.stopSleep(at: selectedTime)
                     } else {
-                        viewModel.startSleepNow()
+                        viewModel.startSleep(at: selectedTime)
                     }
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {

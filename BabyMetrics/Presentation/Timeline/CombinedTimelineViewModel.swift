@@ -110,12 +110,23 @@ final class CombinedTimelineViewModel: ObservableObject {
             )
         }
 
-        let sleepItems = sleepEntries.map {
-            EventItem(
-                id: "sleep-\($0.id.uuidString)",
-                date: $0.startDate,
-                kind: .sleep(startDate: $0.startDate, endDate: $0.endDate)
-            )
+        let sleepItems = sleepEntries.flatMap { entry -> [EventItem] in
+            let calendar = Calendar.current
+            var segments: [EventItem] = []
+            var segmentStart = entry.startDate
+            var index = 0
+            while segmentStart < entry.endDate {
+                let nextMidnight = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: segmentStart))!
+                let segmentEnd = min(entry.endDate, nextMidnight)
+                segments.append(EventItem(
+                    id: "sleep-\(entry.id.uuidString)-\(index)",
+                    date: segmentStart,
+                    kind: .sleep(startDate: segmentStart, endDate: segmentEnd)
+                ))
+                segmentStart = segmentEnd
+                index += 1
+            }
+            return segments
         }
 
         events = (feedingItems + sleepItems).sorted { $0.date > $1.date }

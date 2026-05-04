@@ -37,12 +37,12 @@ final class SleepTrackerViewModel: ObservableObject {
         entries.map(\.endDate).max()
     }
 
-    func startSleepNow() {
-        useCases.startSleep(Date())
+    func startSleep(at date: Date) {
+        useCases.startSleep(date)
     }
 
-    func stopSleepNow() {
-        useCases.stopSleep(Date())
+    func stopSleep(at date: Date) {
+        useCases.stopSleep(date)
     }
 
     func durationString(from startDate: Date, to endDate: Date) -> String {

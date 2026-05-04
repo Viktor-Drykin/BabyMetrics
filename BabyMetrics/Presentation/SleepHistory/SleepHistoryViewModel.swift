@@ -12,13 +12,46 @@ final class SleepHistoryViewModel: ObservableObject {
         var id: String { rawValue }
     }
 
+    enum DisplayMode: String, CaseIterable, Identifiable {
+        case list = "Список"
+        case chart = "Діаграма"
+
+        var id: String { rawValue }
+    }
+
+    enum ChartGranularity: String, CaseIterable, Identifiable {
+        case day = "День"
+        case week = "Тиждень"
+
+        var id: String { rawValue }
+    }
+
+    enum ChartStyle: String, CaseIterable, Identifiable {
+        case bars = "Стовпчики"
+        case line = "Лінія"
+
+        var id: String { rawValue }
+    }
+
+    struct SleepChartPoint: Identifiable {
+        let date: Date
+        let durationHours: Double
+
+        var id: String { "\(date.timeIntervalSince1970)" }
+    }
+
     @Published private(set) var entries: [SleepEntry] = []
     @Published var selectedFilter: Filter = .today
+    @Published var selectedMode: DisplayMode = .list
+    @Published var selectedGranularity: ChartGranularity = .day
+    @Published var selectedChartStyle: ChartStyle = .bars
     @Published var isImportingCSV = false
     @Published var importErrorMessage: String?
 
     let csvURL: URL = FileManager.default.temporaryDirectory
         .appendingPathComponent("SleepHistory.csv")
+    let chartImageURL: URL = FileManager.default.temporaryDirectory
+        .appendingPathComponent("SleepChart.png")
 
     private let useCases: SleepUseCases
     private var cancellables = Set<AnyCancellable>()
@@ -53,6 +86,31 @@ final class SleepHistoryViewModel: ObservableObject {
         }
     }
 
+    var durationChartPoints: [SleepChartPoint] {
+        let calendar = Calendar.current
+        var grouped: [Date: Double] = [:]
+
+        for entry in filteredEntries {
+            let bucketDate: Date
+            switch selectedGranularity {
+            case .day:
+                bucketDate = calendar.startOfDay(for: entry.startDate)
+            case .week:
+                let components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: entry.startDate)
+                bucketDate = calendar.date(from: components) ?? calendar.startOfDay(for: entry.startDate)
+            }
+            grouped[bucketDate, default: 0] += entry.duration / 3600.0
+        }
+
+        return grouped
+            .map { SleepChartPoint(date: $0.key, durationHours: $0.value) }
+            .sorted { $0.date < $1.date }
+    }
+
+    var chartTitle: String {
+        selectedGranularity == .day ? "Тривалість сну по днях (год)" : "Тривалість сну по тижнях (год)"
+    }
+
     func deleteFilteredEntries(at offsets: IndexSet) {
         let ids = offsets.map { filteredEntries[$0].id }
         useCases.deleteEntries(ids)
@@ -73,6 +131,14 @@ final class SleepHistoryViewModel: ObservableObject {
         do {
             let csv = useCases.generateCSV(entries)
             try csv.write(to: csvURL, atomically: true, encoding: .utf8)
+        } catch {
+            // Ignore file write errors for now.
+        }
+    }
+
+    func writeChartImage(data: Data) {
+        do {
+            try data.write(to: chartImageURL, options: .atomic)
         } catch {
             // Ignore file write errors for now.
         }

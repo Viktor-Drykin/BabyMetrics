@@ -5,16 +5,16 @@ struct ContentView: View {
     @StateObject private var historyViewModel: HistoryViewModel
     @StateObject private var sleepTrackerViewModel: SleepTrackerViewModel
     @StateObject private var sleepHistoryViewModel: SleepHistoryViewModel
-    @StateObject private var dashboardViewModel: BabyStatusDashboardViewModel
     @StateObject private var combinedTimelineViewModel: CombinedTimelineViewModel
+    @StateObject private var growthViewModel: GrowthViewModel
 
-    init(feedingUseCases: FeedingUseCases, sleepUseCases: SleepUseCases) {
+    init(feedingUseCases: FeedingUseCases, sleepUseCases: SleepUseCases, growthUseCases: GrowthUseCases) {
         _recordViewModel = StateObject(wrappedValue: RecordFeedingViewModel(useCases: feedingUseCases))
         _historyViewModel = StateObject(wrappedValue: HistoryViewModel(useCases: feedingUseCases))
         _sleepTrackerViewModel = StateObject(wrappedValue: SleepTrackerViewModel(useCases: sleepUseCases))
         _sleepHistoryViewModel = StateObject(wrappedValue: SleepHistoryViewModel(useCases: sleepUseCases))
-        _dashboardViewModel = StateObject(wrappedValue: BabyStatusDashboardViewModel(feedingUseCases: feedingUseCases, sleepUseCases: sleepUseCases))
         _combinedTimelineViewModel = StateObject(wrappedValue: CombinedTimelineViewModel(feedingUseCases: feedingUseCases, sleepUseCases: sleepUseCases))
+        _growthViewModel = StateObject(wrappedValue: GrowthViewModel(useCases: growthUseCases))
     }
 
     var body: some View {
@@ -29,9 +29,9 @@ struct ContentView: View {
                     Label("Сон", systemImage: "moon.zzz")
                 }
 
-            BabyStatusTabView(viewModel: dashboardViewModel)
+            GrowthView(viewModel: growthViewModel)
                 .tabItem {
-                    Label("Стан", systemImage: "figure.and.child.holdinghands")
+                    Label("Ріст", systemImage: "chart.line.uptrend.xyaxis")
                 }
 
             CombinedTimelineView(viewModel: combinedTimelineViewModel)
@@ -53,6 +53,7 @@ struct ContentView: View {
 #Preview {
     ContentView(
         feedingUseCases: FeedingUseCases(repository: UserDefaultsFeedingRepository()),
-        sleepUseCases: SleepUseCases(repository: UserDefaultsSleepRepository())
+        sleepUseCases: SleepUseCases(repository: UserDefaultsSleepRepository()),
+        growthUseCases: GrowthUseCases(repository: UserDefaultsGrowthRepository())
     )
 }
