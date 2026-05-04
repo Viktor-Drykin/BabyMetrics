@@ -30,23 +30,12 @@ struct HistoryView: View {
 
     private var chartContent: some View {
         Chart(viewModel.sideChartPoints) { point in
-            switch viewModel.selectedChartStyle {
-            case .bars:
-                BarMark(
-                    x: .value("Період", point.date),
-                    y: .value("Кількість", point.count)
-                )
-                .position(by: .value("Сторона", point.side.localizedTitle))
-                .foregroundStyle(by: .value("Сторона", point.side.localizedTitle))
-            case .line:
-                LineMark(
-                    x: .value("Період", point.date),
-                    y: .value("Кількість", point.count)
-                )
-                .interpolationMethod(.catmullRom)
-                .symbol(.circle)
-                .foregroundStyle(by: .value("Сторона", point.side.localizedTitle))
-            }
+            BarMark(
+                x: .value("Період", point.date),
+                y: .value("Кількість", point.count)
+            )
+            .position(by: .value("Сторона", point.side.localizedTitle))
+            .foregroundStyle(by: .value("Сторона", point.side.localizedTitle))
         }
         .chartForegroundStyleScale([
             "Ліва": Color.blue,
@@ -141,20 +130,6 @@ struct HistoryView: View {
                             } else {
                                 ScrollView {
                                     VStack(alignment: .leading, spacing: 16) {
-                                        Picker("Групування", selection: $viewModel.selectedGranularity) {
-                                            ForEach(HistoryViewModel.ChartGranularity.allCases) { granularity in
-                                                Text(granularity.rawValue).tag(granularity)
-                                            }
-                                        }
-                                        .pickerStyle(.segmented)
-
-                                        Picker("Тип графіка", selection: $viewModel.selectedChartStyle) {
-                                            ForEach(HistoryViewModel.ChartStyle.allCases) { style in
-                                                Text(style.rawValue).tag(style)
-                                            }
-                                        }
-                                        .pickerStyle(.segmented)
-
                                         Text(viewModel.chartTitle)
                                             .font(.headline)
 
@@ -213,12 +188,6 @@ struct HistoryView: View {
             updateChartImageFile()
         }
         .onChange(of: viewModel.selectedFilter) { _, _ in
-            updateChartImageFile()
-        }
-        .onChange(of: viewModel.selectedGranularity) { _, _ in
-            updateChartImageFile()
-        }
-        .onChange(of: viewModel.selectedChartStyle) { _, _ in
             updateChartImageFile()
         }
         .fileImporter(

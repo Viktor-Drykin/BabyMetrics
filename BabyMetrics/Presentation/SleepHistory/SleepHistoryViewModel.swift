@@ -19,20 +19,6 @@ final class SleepHistoryViewModel: ObservableObject {
         var id: String { rawValue }
     }
 
-    enum ChartGranularity: String, CaseIterable, Identifiable {
-        case day = "День"
-        case week = "Тиждень"
-
-        var id: String { rawValue }
-    }
-
-    enum ChartStyle: String, CaseIterable, Identifiable {
-        case bars = "Стовпчики"
-        case line = "Лінія"
-
-        var id: String { rawValue }
-    }
-
     struct SleepChartPoint: Identifiable {
         let date: Date
         let durationHours: Double
@@ -43,8 +29,6 @@ final class SleepHistoryViewModel: ObservableObject {
     @Published private(set) var entries: [SleepEntry] = []
     @Published var selectedFilter: Filter = .today
     @Published var selectedMode: DisplayMode = .list
-    @Published var selectedGranularity: ChartGranularity = .day
-    @Published var selectedChartStyle: ChartStyle = .bars
     @Published var isImportingCSV = false
     @Published var importErrorMessage: String?
 
@@ -91,14 +75,7 @@ final class SleepHistoryViewModel: ObservableObject {
         var grouped: [Date: Double] = [:]
 
         for entry in filteredEntries {
-            let bucketDate: Date
-            switch selectedGranularity {
-            case .day:
-                bucketDate = calendar.startOfDay(for: entry.startDate)
-            case .week:
-                let components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: entry.startDate)
-                bucketDate = calendar.date(from: components) ?? calendar.startOfDay(for: entry.startDate)
-            }
+            let bucketDate = calendar.startOfDay(for: entry.startDate)
             grouped[bucketDate, default: 0] += entry.duration / 3600.0
         }
 
@@ -107,9 +84,7 @@ final class SleepHistoryViewModel: ObservableObject {
             .sorted { $0.date < $1.date }
     }
 
-    var chartTitle: String {
-        selectedGranularity == .day ? "Тривалість сну по днях (год)" : "Тривалість сну по тижнях (год)"
-    }
+    var chartTitle: String { "Тривалість сну по днях (год)" }
 
     func deleteFilteredEntries(at offsets: IndexSet) {
         let ids = offsets.map { filteredEntries[$0].id }

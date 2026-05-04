@@ -30,22 +30,11 @@ struct SleepHistoryView: View {
 
     private var chartContent: some View {
         Chart(viewModel.durationChartPoints) { point in
-            switch viewModel.selectedChartStyle {
-            case .bars:
-                BarMark(
-                    x: .value("Період", point.date),
-                    y: .value("Годин", point.durationHours)
-                )
-                .foregroundStyle(Color.indigo)
-            case .line:
-                LineMark(
-                    x: .value("Період", point.date),
-                    y: .value("Годин", point.durationHours)
-                )
-                .interpolationMethod(.catmullRom)
-                .symbol(.circle)
-                .foregroundStyle(Color.indigo)
-            }
+            BarMark(
+                x: .value("Період", point.date),
+                y: .value("Годин", point.durationHours)
+            )
+            .foregroundStyle(Color.indigo)
         }
         .chartXAxis {
             AxisMarks(values: .automatic(desiredCount: 6))
@@ -125,20 +114,6 @@ struct SleepHistoryView: View {
                             } else {
                                 ScrollView {
                                     VStack(alignment: .leading, spacing: 16) {
-                                        Picker("Групування", selection: $viewModel.selectedGranularity) {
-                                            ForEach(SleepHistoryViewModel.ChartGranularity.allCases) { g in
-                                                Text(g.rawValue).tag(g)
-                                            }
-                                        }
-                                        .pickerStyle(.segmented)
-
-                                        Picker("Тип графіка", selection: $viewModel.selectedChartStyle) {
-                                            ForEach(SleepHistoryViewModel.ChartStyle.allCases) { s in
-                                                Text(s.rawValue).tag(s)
-                                            }
-                                        }
-                                        .pickerStyle(.segmented)
-
                                         Text(viewModel.chartTitle)
                                             .font(.headline)
 
@@ -198,8 +173,6 @@ struct SleepHistoryView: View {
             updateChartImageFile()
         }
         .onChange(of: viewModel.selectedFilter) { _, _ in updateChartImageFile() }
-        .onChange(of: viewModel.selectedGranularity) { _, _ in updateChartImageFile() }
-        .onChange(of: viewModel.selectedChartStyle) { _, _ in updateChartImageFile() }
         .fileImporter(
             isPresented: $viewModel.isImportingCSV,
             allowedContentTypes: [.commaSeparatedText, .plainText],

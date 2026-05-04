@@ -19,20 +19,6 @@ final class HistoryViewModel: ObservableObject {
         var id: String { rawValue }
     }
 
-    enum ChartGranularity: String, CaseIterable, Identifiable {
-        case day = "День"
-        case week = "Тиждень"
-
-        var id: String { rawValue }
-    }
-
-    enum ChartStyle: String, CaseIterable, Identifiable {
-        case bars = "Стовпчики"
-        case line = "Лінія"
-
-        var id: String { rawValue }
-    }
-
     struct FeedingSideChartPoint: Identifiable {
         let date: Date
         let side: BreastSide
@@ -44,8 +30,6 @@ final class HistoryViewModel: ObservableObject {
     @Published private(set) var entries: [FeedingEntry] = []
     @Published var selectedFilter: Filter = .today
     @Published var selectedMode: DisplayMode = .list
-    @Published var selectedGranularity: ChartGranularity = .day
-    @Published var selectedChartStyle: ChartStyle = .bars
     @Published var isImportingCSV = false
     @Published var importErrorMessage: String?
 
@@ -92,16 +76,7 @@ final class HistoryViewModel: ObservableObject {
         var groupedCounts: [Date: [BreastSide: Int]] = [:]
 
         for entry in filteredEntries {
-            let bucketDate: Date
-
-            switch selectedGranularity {
-            case .day:
-                bucketDate = calendar.startOfDay(for: entry.date)
-            case .week:
-                let components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: entry.date)
-                bucketDate = calendar.date(from: components) ?? calendar.startOfDay(for: entry.date)
-            }
-
+            let bucketDate = calendar.startOfDay(for: entry.date)
             groupedCounts[bucketDate, default: [:]][entry.side, default: 0] += 1
         }
 
@@ -114,9 +89,7 @@ final class HistoryViewModel: ObservableObject {
             .sorted { $0.date < $1.date }
     }
 
-    var chartTitle: String {
-        selectedGranularity == .day ? "Кількість годувань по днях" : "Кількість годувань по тижнях"
-    }
+    var chartTitle: String { "Кількість годувань по днях" }
 
     func deleteFilteredEntries(at offsets: IndexSet) {
         let idsToDelete = offsets.map { filteredEntries[$0].id }
