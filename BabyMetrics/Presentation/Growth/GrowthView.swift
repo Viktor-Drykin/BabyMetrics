@@ -17,6 +17,7 @@ struct GrowthView: View {
                 }
                 .padding()
             }
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle("Ріст")
             .background(AppTheme.warmBackground.ignoresSafeArea())
             .toolbar {
