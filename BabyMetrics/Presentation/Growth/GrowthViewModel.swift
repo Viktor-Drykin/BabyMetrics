@@ -4,7 +4,7 @@ import Combine
 @MainActor
 final class GrowthViewModel: ObservableObject {
     enum Metric: String, CaseIterable, Identifiable {
-        case weight = "Вага (кг)"
+        case weight = "Вага (г)"
         case height = "Зріст (см)"
         case head = "Голова (см)"
 
@@ -50,7 +50,7 @@ final class GrowthViewModel: ObservableObject {
         entries.compactMap { entry in
             let value: Double?
             switch selectedMetric {
-            case .weight: value = entry.weightKg
+            case .weight: value = entry.weightGrams
             case .height: value = entry.heightCm
             case .head:   value = entry.headCm
             }
@@ -68,7 +68,7 @@ final class GrowthViewModel: ObservableObject {
         let entry = GrowthEntry(
             id: UUID(),
             date: formDate,
-            weightKg: Double(formWeightText.replacingOccurrences(of: ",", with: ".")),
+            weightGrams: Double(formWeightText.replacingOccurrences(of: ",", with: ".")),
             heightCm: Double(formHeightText.replacingOccurrences(of: ",", with: ".")),
             headCm: Double(formHeadText.replacingOccurrences(of: ",", with: "."))
         )
@@ -79,8 +79,8 @@ final class GrowthViewModel: ObservableObject {
         formHeadText = ""
     }
 
-    func updateEntry(id: UUID, date: Date, weightKg: Double?, heightCm: Double?, headCm: Double?) {
-        useCases.updateEntry(id, date, weightKg, heightCm, headCm)
+    func updateEntry(id: UUID, date: Date, weightGrams: Double?, heightCm: Double?, headCm: Double?) {
+        useCases.updateEntry(id, date, weightGrams, heightCm, headCm)
     }
 
     func deleteEntries(at offsets: IndexSet) {
@@ -89,10 +89,10 @@ final class GrowthViewModel: ObservableObject {
     }
 
     func writeCSVFile() {
-        let header = "date,weight_kg,height_cm,head_cm"
+        let header = "date,weight_g,height_cm,head_cm"
         let rows = entries.map { entry in
             let date = csvDateFormatter.string(from: entry.date)
-            let weight = entry.weightKg.map { String($0) } ?? ""
+            let weight = entry.weightGrams.map { String(Int($0)) } ?? ""
             let height = entry.heightCm.map { String($0) } ?? ""
             let head = entry.headCm.map { String($0) } ?? ""
             return "\(date),\(weight),\(height),\(head)"
@@ -126,7 +126,7 @@ final class GrowthViewModel: ObservableObject {
         struct CSVImportError: LocalizedError {
             let line: Int
             var errorDescription: String? {
-                "Невірний CSV формат у рядку \(line). Очікується: yyyy-MM-dd,weight_kg,height_cm,head_cm"
+                "Невірний CSV формат у рядку \(line). Очікується: yyyy-MM-dd,weight_g,height_cm,head_cm"
             }
         }
 
@@ -152,7 +152,7 @@ final class GrowthViewModel: ObservableObject {
             return GrowthEntry(
                 id: UUID(),
                 date: date,
-                weightKg: parts.count > 1 ? Double(parts[1]) : nil,
+                weightGrams: parts.count > 1 ? Double(parts[1]) : nil,
                 heightCm: parts.count > 2 ? Double(parts[2]) : nil,
                 headCm: parts.count > 3 ? Double(parts[3]) : nil
             )

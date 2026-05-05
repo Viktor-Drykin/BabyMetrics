@@ -33,10 +33,10 @@ final class UserDefaultsGrowthRepository: ObservableObject, GrowthRepository {
         saveEntries()
     }
 
-    func updateEntry(id: UUID, date: Date, weightKg: Double?, heightCm: Double?, headCm: Double?) {
+    func updateEntry(id: UUID, date: Date, weightGrams: Double?, heightCm: Double?, headCm: Double?) {
         guard let index = entries.firstIndex(where: { $0.id == id }) else { return }
         entries[index].date = date
-        entries[index].weightKg = weightKg
+        entries[index].weightGrams = weightGrams
         entries[index].heightCm = heightCm
         entries[index].headCm = headCm
         entries.sort { $0.date > $1.date }

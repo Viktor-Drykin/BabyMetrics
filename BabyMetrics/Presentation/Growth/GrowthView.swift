@@ -73,8 +73,8 @@ struct GrowthView: View {
                 Image(systemName: "scalemass")
                     .foregroundStyle(.secondary)
                     .frame(width: 24)
-                TextField("Вага, кг", text: $viewModel.formWeightText)
-                    .keyboardType(.decimalPad)
+                TextField("Вага, г", text: $viewModel.formWeightText)
+                    .keyboardType(.numberPad)
             }
 
             HStack {
@@ -199,8 +199,8 @@ private struct GrowthEntryRow: View {
                     .font(.subheadline.weight(.semibold))
 
                 HStack(spacing: 12) {
-                    if let w = entry.weightKg {
-                        Label(String(format: "%.2f кг", w), systemImage: "scalemass")
+                    if let w = entry.weightGrams {
+                        Label("\(Int(w)) г", systemImage: "scalemass")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -240,29 +240,46 @@ struct EditGrowthEntryView: View {
         self.viewModel = viewModel
         self.entry = entry
         _date = State(initialValue: entry.date)
-        _weightText = State(initialValue: entry.weightKg.map { String($0) } ?? "")
+        _weightText = State(initialValue: entry.weightGrams.map { String(Int($0)) } ?? "")
         _heightText = State(initialValue: entry.heightCm.map { String($0) } ?? "")
         _headText = State(initialValue: entry.headCm.map { String($0) } ?? "")
     }
 
     var body: some View {
         Form {
-            DatePicker("Дата", selection: $date, displayedComponents: [.date])
-            TextField("Вага, кг", text: $weightText).keyboardType(.decimalPad)
-            TextField("Зріст, см", text: $heightText).keyboardType(.decimalPad)
-            TextField("Обвід голови, см", text: $headText).keyboardType(.decimalPad)
-
-            Button("Зберегти зміни") {
-                viewModel.updateEntry(
-                    id: entry.id,
-                    date: date,
-                    weightKg: Double(weightText.replacingOccurrences(of: ",", with: ".")),
-                    heightCm: Double(heightText.replacingOccurrences(of: ",", with: ".")),
-                    headCm: Double(headText.replacingOccurrences(of: ",", with: "."))
-                )
-                dismiss()
+            Section("Дата") {
+                DatePicker("", selection: $date, displayedComponents: [.date])
+                    .labelsHidden()
             }
-            .frame(maxWidth: .infinity, alignment: .center)
+
+            Section("Вага, г") {
+                TextField("Не заповнено", text: $weightText)
+                    .keyboardType(.numberPad)
+            }
+
+            Section("Зріст, см") {
+                TextField("Не заповнено", text: $heightText)
+                    .keyboardType(.decimalPad)
+            }
+
+            Section("Обвід голови, см") {
+                TextField("Не заповнено", text: $headText)
+                    .keyboardType(.decimalPad)
+            }
+
+            Section {
+                Button("Зберегти зміни") {
+                    viewModel.updateEntry(
+                        id: entry.id,
+                        date: date,
+                        weightGrams: Double(weightText),
+                        heightCm: Double(heightText.replacingOccurrences(of: ",", with: ".")),
+                        headCm: Double(headText.replacingOccurrences(of: ",", with: "."))
+                    )
+                    dismiss()
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+            }
         }
         .navigationTitle("Редагування")
     }
