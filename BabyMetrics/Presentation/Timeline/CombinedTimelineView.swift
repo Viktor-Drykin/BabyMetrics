@@ -80,7 +80,7 @@ struct CombinedTimelineView: View {
                                             .foregroundStyle(.primary)
 
                                         Text(
-                                            "Годувань: \(section.feedingCount) | Снів: \(section.sleepCount) | Сон: \(viewModel.durationString(fromSeconds: Int(section.totalSleepDuration)))"
+                                            "Годувань: \(section.feedingCount) | Снів: \(section.sleepCount) | Підгузків: \(section.diaperCount) | Сон: \(viewModel.durationString(fromSeconds: Int(section.totalSleepDuration)))"
                                         )
                                         .font(.subheadline.weight(.semibold))
                                         .foregroundStyle(Color.primary.opacity(0.92))
@@ -111,6 +111,9 @@ struct CombinedTimelineView: View {
                                         .font(.subheadline)
 
                                     Text("Снів: \(section.sleepCount)")
+                                        .font(.subheadline)
+
+                                    Text("Підгузків: \(section.diaperCount)")
                                         .font(.subheadline)
 
                                     Text("Загальний сон: \(viewModel.durationString(fromSeconds: Int(section.totalSleepDuration)))")
@@ -169,6 +172,33 @@ struct CombinedTimelineView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
+        case .diaper(let type):
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(historyDateString(from: event.date))
+                    Text("Підгузок")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                Text(type.localizedTitle)
+                    .font(.caption.weight(.semibold))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(diaperColor(for: type).opacity(0.18))
+                    .foregroundStyle(diaperColor(for: type))
+                    .clipShape(Capsule())
+            }
+        }
+    }
+
+    private func diaperColor(for type: DiaperType) -> Color {
+        switch type {
+        case .wet:   return .blue
+        case .dirty: return .brown
+        case .mixed: return .purple
         }
     }
 

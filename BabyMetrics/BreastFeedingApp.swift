@@ -12,13 +12,15 @@ struct BreastFeedingApp: App {
     @StateObject private var repository = UserDefaultsFeedingRepository()
     @StateObject private var sleepRepository = UserDefaultsSleepRepository()
     @StateObject private var growthRepository = UserDefaultsGrowthRepository()
+    @StateObject private var diaperRepository = UserDefaultsDiaperRepository()
 
     var body: some Scene {
         WindowGroup {
             ContentView(
                 feedingUseCases: FeedingUseCases(repository: repository),
                 sleepUseCases: SleepUseCases(repository: sleepRepository),
-                growthUseCases: GrowthUseCases(repository: growthRepository)
+                growthUseCases: GrowthUseCases(repository: growthRepository),
+                diaperUseCases: DiaperUseCases(repository: diaperRepository)
             )
         }
     }

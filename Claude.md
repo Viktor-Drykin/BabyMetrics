@@ -25,14 +25,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 The codebase follows a layered pattern with clear separation of concerns:
 
 1. **Domain Layer** (`BabyMetrics/Domain/`)
-   - Entities: `FeedingEntry`, `SleepEntry`, `GrowthEntry`
-   - Use cases: `FeedingUseCases`, `SleepUseCases`, `GrowthUseCases` (structs of closures)
-   - Repository protocols: `FeedingRepository`, `SleepRepository`, `GrowthRepository`
+   - Entities: `FeedingEntry`, `SleepEntry`, `GrowthEntry`, `DiaperEntry`
+   - Use cases: `FeedingUseCases`, `SleepUseCases`, `GrowthUseCases`, `DiaperUseCases` (structs of closures)
+   - Repository protocols: `FeedingRepository`, `SleepRepository`, `GrowthRepository`, `DiaperRepository`
 
 2. **Data Layer** (`BabyMetrics/Data/Repositories/`)
    - `UserDefaultsFeedingRepository` — persists feeding entries as JSON
    - `UserDefaultsSleepRepository` — persists sleep entries + active sleep state as JSON
    - `UserDefaultsGrowthRepository` — persists growth measurement entries as JSON
+   - `UserDefaultsDiaperRepository` — persists diaper entries as JSON
    - All repositories are `@MainActor`, `@Published`, sorted descending by date
 
 3. **Presentation Layer** (`BabyMetrics/Presentation/`)
@@ -43,11 +44,12 @@ The codebase follows a layered pattern with clear separation of concerns:
 
 | Tab | Label | View | Description |
 |-----|-------|------|-------------|
-| 1 | Запис | `RecordFeedingView` | Quick breastfeeding entry (time + side) |
-| 2 | Сон | `SleepTrackerView` | Start/stop sleep with custom time pickers |
-| 3 | Ріст | `GrowthView` | Log weight/height/head circumference with chart |
-| 4 | Разом | `CombinedTimelineView` | All events grouped by day (Events / Days mode) |
-| 5 | Історія | `CombinedHistoryView` | Feeding + Sleep history tabs with list and bar chart |
+| 1 | Годування | `RecordFeedingView` | Quick breastfeeding entry (time + side) |
+| 2 | Підгузки | `RecordDiaperView` | Log a diaper change (Wet / Dirty / Mixed) with optional weight |
+| 3 | Сон | `SleepTrackerView` | Start/stop sleep with custom time pickers |
+| 4 | Ріст | `GrowthView` | Log weight/height/head circumference with chart |
+| 5 | Разом | `CombinedTimelineView` | All events grouped by day (Events / Days mode) |
+| 6 | Історія | `CombinedHistoryView` | Feeding / Sleep / Diaper history tabs with list and bar chart |
 
 ## Key Patterns
 
@@ -70,17 +72,23 @@ The codebase follows a layered pattern with clear separation of concerns:
 - Keyboard dismisses on scroll swipe (`.scrollDismissesKeyboard(.interactively)`)
 - CSV format: `date,weight_kg,height_cm,head_cm` (date as `yyyy-MM-dd`)
 
+### Diaper (`DiaperEntry`)
+- Fields: `date`, `type` (`wet` / `dirty` / `mixed`), `weightGrams?`
+- Recording UI lives in its own tab (`RecordDiaperView`); history is a sub-tab of `CombinedHistoryView`
+
 ### History Charts
 - Feeding chart: bar chart showing left/right feeding counts per day
 - Sleep chart: bar chart showing total sleep hours per day
-- Both support List / Chart display mode toggle and filter (All / Today / Week / Month)
+- Diaper chart: bar chart showing diaper counts per day, grouped by type
+- All support List / Chart display mode toggle and filter (All / Today / Week / Month)
 - Charts can be exported as PNG via share button
 
 ### CSV Import / Export
 - Feeding: `date,side` format (`yyyy-MM-dd HH:mm:ss`, side as `Left`/`Right`)
 - Sleep: `start_date,end_date,duration_minutes` format
 - Growth: `date,weight_kg,height_cm,head_cm` format (empty fields for nil values)
-- All three support import via file picker and export via ShareLink
+- Diaper: `date,type[,weight_g]` format (`yyyy-MM-dd HH:mm:ss`, type as `Wet`/`Dirty`/`Mixed`)
+- All four support import via file picker and export via ShareLink
 
 ## Important Files
 

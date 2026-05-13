@@ -9,6 +9,7 @@ final class CombinedTimelineViewModel: ObservableObject {
         let feedingCount: Int
         let sleepCount: Int
         let totalSleepDuration: TimeInterval
+        let diaperCount: Int
 
         var id: String { "\(date.timeIntervalSince1970)" }
     }
@@ -17,6 +18,7 @@ final class CombinedTimelineViewModel: ObservableObject {
         enum Kind {
             case feeding(side: BreastSide)
             case sleep(startDate: Date, endDate: Date)
+            case diaper(type: DiaperType)
         }
 
         let id: String
@@ -28,24 +30,28 @@ final class CombinedTimelineViewModel: ObservableObject {
 
     private let feedingUseCases: FeedingUseCases
     private let sleepUseCases: SleepUseCases
+    private let diaperUseCases: DiaperUseCases
     private var cancellables = Set<AnyCancellable>()
 
-    init(feedingUseCases: FeedingUseCases, sleepUseCases: SleepUseCases) {
+    init(feedingUseCases: FeedingUseCases, sleepUseCases: SleepUseCases, diaperUseCases: DiaperUseCases) {
         self.feedingUseCases = feedingUseCases
         self.sleepUseCases = sleepUseCases
+        self.diaperUseCases = diaperUseCases
 
         rebuildEvents(
             feedingEntries: feedingUseCases.getEntries(),
-            sleepEntries: sleepUseCases.getEntries()
+            sleepEntries: sleepUseCases.getEntries(),
+            diaperEntries: diaperUseCases.getEntries()
         )
 
-        Publishers.CombineLatest(
+        Publishers.CombineLatest3(
             feedingUseCases.observeEntries(),
-            sleepUseCases.observeEntries()
+            sleepUseCases.observeEntries(),
+            diaperUseCases.observeEntries()
         )
         .receive(on: DispatchQueue.main)
-        .sink { [weak self] feedingEntries, sleepEntries in
-            self?.rebuildEvents(feedingEntries: feedingEntries, sleepEntries: sleepEntries)
+        .sink { [weak self] feedingEntries, sleepEntries, diaperEntries in
+            self?.rebuildEvents(feedingEntries: feedingEntries, sleepEntries: sleepEntries, diaperEntries: diaperEntries)
         }
         .store(in: &cancellables)
     }
@@ -75,18 +81,19 @@ final class CombinedTimelineViewModel: ObservableObject {
 
         return grouped
             .map { day, dayEvents in
-                let feedingCount = dayEvents.reduce(into: 0) { partialResult, event in
-                    if case .feeding = event.kind {
-                        partialResult += 1
-                    }
-                }
-
+                var feedingCount = 0
                 var sleepCount = 0
+                var diaperCount = 0
                 var totalSleepDuration: TimeInterval = 0
                 for event in dayEvents {
-                    if case .sleep(let startDate, let endDate) = event.kind {
+                    switch event.kind {
+                    case .feeding:
+                        feedingCount += 1
+                    case .sleep(let startDate, let endDate):
                         sleepCount += 1
                         totalSleepDuration += max(0, endDate.timeIntervalSince(startDate))
+                    case .diaper:
+                        diaperCount += 1
                     }
                 }
 
@@ -95,13 +102,14 @@ final class CombinedTimelineViewModel: ObservableObject {
                     events: dayEvents.sorted { $0.date > $1.date },
                     feedingCount: feedingCount,
                     sleepCount: sleepCount,
-                    totalSleepDuration: totalSleepDuration
+                    totalSleepDuration: totalSleepDuration,
+                    diaperCount: diaperCount
                 )
             }
             .sorted { $0.date > $1.date }
     }
 
-    private func rebuildEvents(feedingEntries: [FeedingEntry], sleepEntries: [SleepEntry]) {
+    private func rebuildEvents(feedingEntries: [FeedingEntry], sleepEntries: [SleepEntry], diaperEntries: [DiaperEntry]) {
         let feedingItems = feedingEntries.map {
             EventItem(
                 id: "feeding-\($0.id.uuidString)",
@@ -129,6 +137,14 @@ final class CombinedTimelineViewModel: ObservableObject {
             return segments
         }
 
-        events = (feedingItems + sleepItems).sorted { $0.date > $1.date }
+        let diaperItems = diaperEntries.map {
+            EventItem(
+                id: "diaper-\($0.id.uuidString)",
+                date: $0.date,
+                kind: .diaper(type: $0.type)
+            )
+        }
+
+        events = (feedingItems + sleepItems + diaperItems).sorted { $0.date > $1.date }
     }
 }

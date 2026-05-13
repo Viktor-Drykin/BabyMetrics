@@ -4,6 +4,7 @@ struct CombinedHistoryView: View {
     enum HistoryType: String, CaseIterable, Identifiable {
         case feeding = "Годування"
         case sleep = "Сон"
+        case diaper = "Підгузки"
 
         var id: String { rawValue }
     }
@@ -11,6 +12,7 @@ struct CombinedHistoryView: View {
     @State private var selectedType: HistoryType = .feeding
     @StateObject var feedingHistoryViewModel: HistoryViewModel
     @StateObject var sleepHistoryViewModel: SleepHistoryViewModel
+    @StateObject var diaperHistoryViewModel: DiaperHistoryViewModel
 
     var body: some View {
         NavigationStack {
@@ -30,6 +32,8 @@ struct CombinedHistoryView: View {
                         HistoryView(viewModel: feedingHistoryViewModel, isEmbedded: true)
                     case .sleep:
                         SleepHistoryView(viewModel: sleepHistoryViewModel, isEmbedded: true)
+                    case .diaper:
+                        DiaperHistoryView(viewModel: diaperHistoryViewModel, isEmbedded: true)
                     }
                 }
             }

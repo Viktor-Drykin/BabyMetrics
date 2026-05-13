@@ -4,6 +4,8 @@ import UniformTypeIdentifiers
 
 struct GrowthView: View {
     @StateObject var viewModel: GrowthViewModel
+    @State private var visibleDomainDays: Double = 90
+    @State private var baselineDomainDays: Double = 90
 
     var body: some View {
         NavigationStack {
@@ -138,12 +140,9 @@ struct GrowthView: View {
                         y: .value("Значення", point.value)
                     )
                     .foregroundStyle(Color.teal)
-                    .annotation(position: .top, alignment: .center) {
-                        Text(String(format: "%.1f", point.value))
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
                 }
+                .chartScrollableAxes(.horizontal)
+                .chartXVisibleDomain(length: visibleDomainDays * 86_400)
                 .chartXAxis {
                     AxisMarks(values: .automatic(desiredCount: 5))
                 }
@@ -151,6 +150,15 @@ struct GrowthView: View {
                     AxisMarks(position: .leading)
                 }
                 .frame(height: 220)
+                .gesture(
+                    MagnificationGesture()
+                        .onChanged { scale in
+                            visibleDomainDays = max(7, min(730, baselineDomainDays / scale))
+                        }
+                        .onEnded { scale in
+                            baselineDomainDays = max(7, min(730, baselineDomainDays / scale))
+                        }
+                )
             }
         }
         .padding()
