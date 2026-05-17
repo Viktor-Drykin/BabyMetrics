@@ -63,7 +63,7 @@ struct CombinedTimelineView: View {
                         ContentUnavailableView(
                             "Ще немає записів",
                             systemImage: "tray",
-                            description: Text("Додайте годування або запис сну.")
+                            description: Text("Додайте годування, сон, підгузок або розминку.")
                         )
                     } else if selectedMode == .events {
                         List {
@@ -80,7 +80,7 @@ struct CombinedTimelineView: View {
                                             .foregroundStyle(.primary)
 
                                         Text(
-                                            "Годувань: \(section.feedingCount) | Снів: \(section.sleepCount) | Підгузків: \(section.diaperCount) (вага: \(section.totalDiaperWeightGrams) г) | Сон: \(viewModel.durationString(fromSeconds: Int(section.totalSleepDuration)))"
+                                            "Годувань: \(section.feedingCount) | Снів: \(section.sleepCount) | Підгузків: \(section.diaperCount) (вага: \(section.totalDiaperWeightGrams) г) | Розминка: \(section.tummyTimeCount) (\(viewModel.durationString(fromSeconds: Int(section.totalTummyTimeDuration)))) | Сон: \(viewModel.durationString(fromSeconds: Int(section.totalSleepDuration)))"
                                         )
                                         .font(.subheadline.weight(.semibold))
                                         .foregroundStyle(Color.primary.opacity(0.92))
@@ -115,6 +115,13 @@ struct CombinedTimelineView: View {
 
                                     Text("Підгузків: \(section.diaperCount)")
                                         .font(.subheadline)
+
+                                    Text("Розминок: \(section.tummyTimeCount)")
+                                        .font(.subheadline)
+
+                                    Text("Загальна розминка: \(viewModel.durationString(fromSeconds: Int(section.totalTummyTimeDuration)))")
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundStyle(.orange)
 
                                     Text("Вага підгузків: \(section.totalDiaperWeightGrams) г")
                                         .font(.subheadline)
@@ -203,6 +210,24 @@ struct CombinedTimelineView: View {
                     .background(diaperColor(for: type).opacity(0.18))
                     .foregroundStyle(diaperColor(for: type))
                     .clipShape(Capsule())
+            }
+        case .tummyTime(let startDate, let endDate):
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(historyDateString(from: startDate))
+                    Spacer()
+                    Text(viewModel.durationString(from: startDate, to: endDate))
+                        .font(.caption.weight(.semibold))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color.orange.opacity(0.2))
+                        .foregroundStyle(Color.orange)
+                        .clipShape(Capsule())
+                }
+
+                Text("Розминка: \(historyDateString(from: startDate)) - \(historyDateString(from: endDate))")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
             }
         }
     }

@@ -11,6 +11,8 @@ final class CombinedTimelineViewModel: ObservableObject {
         let totalSleepDuration: TimeInterval
         let diaperCount: Int
         let totalDiaperWeightGrams: Int
+        let tummyTimeCount: Int
+        let totalTummyTimeDuration: TimeInterval
 
         var id: String { "\(date.timeIntervalSince1970)" }
     }
@@ -20,6 +22,7 @@ final class CombinedTimelineViewModel: ObservableObject {
             case feeding(side: BreastSide, duration: TimeInterval)
             case sleep(startDate: Date, endDate: Date)
             case diaper(type: DiaperType, weightGrams: Int?)
+            case tummyTime(startDate: Date, endDate: Date)
         }
 
         let id: String
@@ -32,27 +35,31 @@ final class CombinedTimelineViewModel: ObservableObject {
     private let feedingUseCases: FeedingUseCases
     private let sleepUseCases: SleepUseCases
     private let diaperUseCases: DiaperUseCases
+    private let tummyTimeUseCases: TummyTimeUseCases
     private var cancellables = Set<AnyCancellable>()
 
-    init(feedingUseCases: FeedingUseCases, sleepUseCases: SleepUseCases, diaperUseCases: DiaperUseCases) {
+    init(feedingUseCases: FeedingUseCases, sleepUseCases: SleepUseCases, diaperUseCases: DiaperUseCases, tummyTimeUseCases: TummyTimeUseCases) {
         self.feedingUseCases = feedingUseCases
         self.sleepUseCases = sleepUseCases
         self.diaperUseCases = diaperUseCases
+        self.tummyTimeUseCases = tummyTimeUseCases
 
         rebuildEvents(
             feedingEntries: feedingUseCases.getEntries(),
             sleepEntries: sleepUseCases.getEntries(),
-            diaperEntries: diaperUseCases.getEntries()
+            diaperEntries: diaperUseCases.getEntries(),
+            tummyTimeEntries: tummyTimeUseCases.getEntries()
         )
 
-        Publishers.CombineLatest3(
+        Publishers.CombineLatest4(
             feedingUseCases.observeEntries(),
             sleepUseCases.observeEntries(),
-            diaperUseCases.observeEntries()
+            diaperUseCases.observeEntries(),
+            tummyTimeUseCases.observeEntries()
         )
         .receive(on: DispatchQueue.main)
-        .sink { [weak self] feedingEntries, sleepEntries, diaperEntries in
-            self?.rebuildEvents(feedingEntries: feedingEntries, sleepEntries: sleepEntries, diaperEntries: diaperEntries)
+        .sink { [weak self] feedingEntries, sleepEntries, diaperEntries, tummyTimeEntries in
+            self?.rebuildEvents(feedingEntries: feedingEntries, sleepEntries: sleepEntries, diaperEntries: diaperEntries, tummyTimeEntries: tummyTimeEntries)
         }
         .store(in: &cancellables)
     }
@@ -76,8 +83,10 @@ final class CombinedTimelineViewModel: ObservableObject {
                 var feedingCount = 0
                 var sleepCount = 0
                 var diaperCount = 0
+                var tummyTimeCount = 0
                 var totalDiaperWeightGrams = 0
                 var totalSleepDuration: TimeInterval = 0
+                var totalTummyTimeDuration: TimeInterval = 0
                 for event in dayEvents {
                     switch event.kind {
                     case .feeding:
@@ -88,6 +97,9 @@ final class CombinedTimelineViewModel: ObservableObject {
                     case .diaper(_, let weightGrams):
                         diaperCount += 1
                         totalDiaperWeightGrams += max(0, weightGrams ?? 0)
+                    case .tummyTime(let startDate, let endDate):
+                        tummyTimeCount += 1
+                        totalTummyTimeDuration += max(0, endDate.timeIntervalSince(startDate))
                     }
                 }
 
@@ -98,13 +110,15 @@ final class CombinedTimelineViewModel: ObservableObject {
                     sleepCount: sleepCount,
                     totalSleepDuration: totalSleepDuration,
                     diaperCount: diaperCount,
-                    totalDiaperWeightGrams: totalDiaperWeightGrams
+                    totalDiaperWeightGrams: totalDiaperWeightGrams,
+                    tummyTimeCount: tummyTimeCount,
+                    totalTummyTimeDuration: totalTummyTimeDuration
                 )
             }
             .sorted { $0.date > $1.date }
     }
 
-    private func rebuildEvents(feedingEntries: [FeedingEntry], sleepEntries: [SleepEntry], diaperEntries: [DiaperEntry]) {
+    private func rebuildEvents(feedingEntries: [FeedingEntry], sleepEntries: [SleepEntry], diaperEntries: [DiaperEntry], tummyTimeEntries: [TummyTimeEntry]) {
         let feedingItems = feedingEntries.map {
             EventItem(
                 id: "feeding-\($0.id.uuidString)",
@@ -140,6 +154,25 @@ final class CombinedTimelineViewModel: ObservableObject {
             )
         }
 
-        events = (feedingItems + sleepItems + diaperItems).sorted { $0.date > $1.date }
+        let tummyTimeItems = tummyTimeEntries.flatMap { entry -> [EventItem] in
+            let calendar = Calendar.current
+            var segments: [EventItem] = []
+            var segmentStart = entry.startDate
+            var index = 0
+            while segmentStart < entry.endDate {
+                let nextMidnight = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: segmentStart))!
+                let segmentEnd = min(entry.endDate, nextMidnight)
+                segments.append(EventItem(
+                    id: "tummy-\(entry.id.uuidString)-\(index)",
+                    date: segmentStart,
+                    kind: .tummyTime(startDate: segmentStart, endDate: segmentEnd)
+                ))
+                segmentStart = segmentEnd
+                index += 1
+            }
+            return segments
+        }
+
+        events = (feedingItems + sleepItems + diaperItems + tummyTimeItems).sorted { $0.date > $1.date }
     }
 }

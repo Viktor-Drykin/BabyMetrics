@@ -9,16 +9,26 @@ struct ContentView: View {
     @StateObject private var combinedTimelineViewModel: CombinedTimelineViewModel
     @StateObject private var growthViewModel: GrowthViewModel
     @StateObject private var diaperHistoryViewModel: DiaperHistoryViewModel
+    @StateObject private var tummyTimeTrackerViewModel: TummyTimeTrackerViewModel
+    @StateObject private var tummyTimeHistoryViewModel: TummyTimeHistoryViewModel
 
-    init(feedingUseCases: FeedingUseCases, sleepUseCases: SleepUseCases, growthUseCases: GrowthUseCases, diaperUseCases: DiaperUseCases) {
+    init(
+        feedingUseCases: FeedingUseCases,
+        sleepUseCases: SleepUseCases,
+        growthUseCases: GrowthUseCases,
+        diaperUseCases: DiaperUseCases,
+        tummyTimeUseCases: TummyTimeUseCases
+    ) {
         _recordViewModel = StateObject(wrappedValue: RecordFeedingViewModel(useCases: feedingUseCases))
         _recordDiaperViewModel = StateObject(wrappedValue: RecordDiaperViewModel(useCases: diaperUseCases))
         _historyViewModel = StateObject(wrappedValue: HistoryViewModel(useCases: feedingUseCases))
         _sleepTrackerViewModel = StateObject(wrappedValue: SleepTrackerViewModel(useCases: sleepUseCases))
         _sleepHistoryViewModel = StateObject(wrappedValue: SleepHistoryViewModel(useCases: sleepUseCases))
-        _combinedTimelineViewModel = StateObject(wrappedValue: CombinedTimelineViewModel(feedingUseCases: feedingUseCases, sleepUseCases: sleepUseCases, diaperUseCases: diaperUseCases))
+        _combinedTimelineViewModel = StateObject(wrappedValue: CombinedTimelineViewModel(feedingUseCases: feedingUseCases, sleepUseCases: sleepUseCases, diaperUseCases: diaperUseCases, tummyTimeUseCases: tummyTimeUseCases))
         _growthViewModel = StateObject(wrappedValue: GrowthViewModel(useCases: growthUseCases))
         _diaperHistoryViewModel = StateObject(wrappedValue: DiaperHistoryViewModel(useCases: diaperUseCases))
+        _tummyTimeTrackerViewModel = StateObject(wrappedValue: TummyTimeTrackerViewModel(useCases: tummyTimeUseCases))
+        _tummyTimeHistoryViewModel = StateObject(wrappedValue: TummyTimeHistoryViewModel(useCases: tummyTimeUseCases))
     }
 
     var body: some View {
@@ -38,6 +48,11 @@ struct ContentView: View {
                     Label("Сон", systemImage: "moon.zzz")
                 }
 
+            TummyTimeTrackerView(viewModel: tummyTimeTrackerViewModel)
+                .tabItem {
+                    Label("Розминка", systemImage: "figure.play")
+                }
+
             GrowthView(viewModel: growthViewModel)
                 .tabItem {
                     Label("Ріст", systemImage: "chart.line.uptrend.xyaxis")
@@ -51,7 +66,8 @@ struct ContentView: View {
             CombinedHistoryView(
                 feedingHistoryViewModel: historyViewModel,
                 sleepHistoryViewModel: sleepHistoryViewModel,
-                diaperHistoryViewModel: diaperHistoryViewModel
+                diaperHistoryViewModel: diaperHistoryViewModel,
+                tummyTimeHistoryViewModel: tummyTimeHistoryViewModel
             )
                 .tabItem {
                     Label("Історія", systemImage: "clock.arrow.circlepath")
@@ -65,6 +81,7 @@ struct ContentView: View {
         feedingUseCases: FeedingUseCases(repository: UserDefaultsFeedingRepository()),
         sleepUseCases: SleepUseCases(repository: UserDefaultsSleepRepository()),
         growthUseCases: GrowthUseCases(repository: UserDefaultsGrowthRepository()),
-        diaperUseCases: DiaperUseCases(repository: UserDefaultsDiaperRepository())
+        diaperUseCases: DiaperUseCases(repository: UserDefaultsDiaperRepository()),
+        tummyTimeUseCases: TummyTimeUseCases(repository: UserDefaultsTummyTimeRepository())
     )
 }

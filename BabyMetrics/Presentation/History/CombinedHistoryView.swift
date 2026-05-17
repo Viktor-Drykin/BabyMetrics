@@ -5,6 +5,7 @@ struct CombinedHistoryView: View {
         case feeding = "Годування"
         case sleep = "Сон"
         case diaper = "Підгузки"
+        case tummyTime = "Розминка"
 
         var id: String { rawValue }
     }
@@ -13,6 +14,7 @@ struct CombinedHistoryView: View {
     @StateObject var feedingHistoryViewModel: HistoryViewModel
     @StateObject var sleepHistoryViewModel: SleepHistoryViewModel
     @StateObject var diaperHistoryViewModel: DiaperHistoryViewModel
+    @StateObject var tummyTimeHistoryViewModel: TummyTimeHistoryViewModel
 
     var body: some View {
         NavigationStack {
@@ -34,6 +36,8 @@ struct CombinedHistoryView: View {
                         SleepHistoryView(viewModel: sleepHistoryViewModel, isEmbedded: true)
                     case .diaper:
                         DiaperHistoryView(viewModel: diaperHistoryViewModel, isEmbedded: true)
+                    case .tummyTime:
+                        TummyTimeHistoryView(viewModel: tummyTimeHistoryViewModel, isEmbedded: true)
                     }
                 }
             }
