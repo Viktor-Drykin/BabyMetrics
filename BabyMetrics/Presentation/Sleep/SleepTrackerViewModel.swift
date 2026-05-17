@@ -5,8 +5,10 @@ import Combine
 final class SleepTrackerViewModel: ObservableObject {
     @Published private(set) var entries: [SleepEntry] = []
     @Published private(set) var activeSleepStart: Date?
+    @Published private(set) var timerNow: Date = Date()
 
     private let useCases: SleepUseCases
+    private let timer = ActiveSessionTimer()
     private var cancellables = Set<AnyCancellable>()
 
     init(useCases: SleepUseCases) {
@@ -18,6 +20,7 @@ final class SleepTrackerViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 self?.entries = $0
+                self?.updateTimerState()
             }
             .store(in: &cancellables)
 
@@ -25,8 +28,18 @@ final class SleepTrackerViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 self?.activeSleepStart = $0
+                self?.updateTimerState()
             }
             .store(in: &cancellables)
+
+        timer.$now
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.timerNow = $0
+            }
+            .store(in: &cancellables)
+
+        updateTimerState()
     }
 
     var isSleeping: Bool {
@@ -35,6 +48,16 @@ final class SleepTrackerViewModel: ObservableObject {
 
     var latestWakeDate: Date? {
         entries.filter { $0.endDate <= Date() }.map(\.endDate).max()
+    }
+
+    var activeSleepDurationText: String {
+        guard let startDate = activeSleepStart else { return "0 хв" }
+        return DurationTextFormatter.string(from: startDate, to: timerNow)
+    }
+
+    var awakeDurationText: String? {
+        guard let latestWakeDate else { return nil }
+        return DurationTextFormatter.string(from: latestWakeDate, to: timerNow)
     }
 
     func startSleep(at date: Date) {
@@ -46,15 +69,11 @@ final class SleepTrackerViewModel: ObservableObject {
     }
 
     func durationString(from startDate: Date, to endDate: Date) -> String {
-        let seconds = max(0, Int(endDate.timeIntervalSince(startDate)))
-        let days = seconds / 86_400
-        let hours = (seconds % 86_400) / 3_600
-        let minutes = (seconds % 3_600) / 60
+        DurationTextFormatter.string(from: startDate, to: endDate)
+    }
 
-        var parts: [String] = []
-        if days > 0 { parts.append("\(days) д") }
-        if hours > 0 { parts.append("\(hours) год") }
-        if minutes > 0 || parts.isEmpty { parts.append("\(minutes) хв") }
-        return parts.joined(separator: " ")
+    private func updateTimerState() {
+        let shouldRun = activeSleepStart != nil || latestWakeDate != nil
+        timer.setIsRunning(shouldRun)
     }
 }

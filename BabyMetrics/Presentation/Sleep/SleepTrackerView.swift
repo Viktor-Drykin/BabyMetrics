@@ -43,10 +43,8 @@ struct SleepTrackerView: View {
                         Text("Початок: \(startDateString(from: startDate))")
                             .foregroundStyle(.secondary)
 
-                        TimelineView(.periodic(from: Date(), by: 60)) { timeline in
-                            Text(viewModel.durationString(from: startDate, to: timeline.date))
-                                .font(.title3.weight(.bold))
-                        }
+                        Text(viewModel.activeSleepDurationText)
+                            .font(.title3.weight(.bold))
 
                         Divider()
 
@@ -68,10 +66,8 @@ struct SleepTrackerView: View {
                             .font(.title2.weight(.semibold))
 
                         if let latestWakeDate = viewModel.latestWakeDate {
-                            TimelineView(.periodic(from: Date(), by: 60)) { timeline in
-                                Text("Не спить: \(viewModel.durationString(from: latestWakeDate, to: timeline.date))")
-                                    .font(.headline)
-                            }
+                            Text("Не спить: \(viewModel.awakeDurationText ?? viewModel.durationString(from: latestWakeDate, to: Date()))")
+                                .font(.headline)
                         } else {
                             Text("Ще немає завершених снів")
                                 .foregroundStyle(.secondary)

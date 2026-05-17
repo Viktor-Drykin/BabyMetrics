@@ -61,13 +61,13 @@ final class HistoryViewModel: ObservableObject {
         case .all:
             return entries
         case .today:
-            return entries.filter { calendar.isDate($0.date, inSameDayAs: now) }
+            return entries.filter { calendar.isDate($0.startDate, inSameDayAs: now) }
         case .week:
             guard let interval = calendar.dateInterval(of: .weekOfYear, for: now) else { return entries }
-            return entries.filter { interval.contains($0.date) }
+            return entries.filter { interval.contains($0.startDate) }
         case .month:
             guard let interval = calendar.dateInterval(of: .month, for: now) else { return entries }
-            return entries.filter { interval.contains($0.date) }
+            return entries.filter { interval.contains($0.startDate) }
         }
     }
 
@@ -76,7 +76,7 @@ final class HistoryViewModel: ObservableObject {
         var groupedCounts: [Date: [BreastSide: Int]] = [:]
 
         for entry in filteredEntries {
-            let bucketDate = calendar.startOfDay(for: entry.date)
+            let bucketDate = calendar.startOfDay(for: entry.startDate)
             groupedCounts[bucketDate, default: [:]][entry.side, default: 0] += 1
         }
 
@@ -96,8 +96,8 @@ final class HistoryViewModel: ObservableObject {
         useCases.deleteEntries(idsToDelete)
     }
 
-    func updateEntry(id: UUID, date: Date, side: BreastSide) {
-        useCases.updateEntry(id, date, side)
+    func updateEntry(id: UUID, startDate: Date, endDate: Date, side: BreastSide) {
+        useCases.updateEntry(id, startDate, endDate, side)
     }
 
     func writeCSVFile() {
@@ -141,7 +141,7 @@ final class HistoryViewModel: ObservableObject {
             let line: Int
 
             var errorDescription: String? {
-                "Невірний CSV формат у рядку \(line). Очікується: yyyy-MM-dd HH:mm:ss,Left|Right"
+                "Невірний CSV формат у рядку \(line). Очікується: date,side або start_date,end_date[,duration_minutes],side"
             }
         }
 
@@ -157,12 +157,10 @@ final class HistoryViewModel: ObservableObject {
 
         guard !rawLines.isEmpty else { return [] }
 
-        let lines: [String]
-        if rawLines.first?.lowercased() == "date,side" {
-            lines = Array(rawLines.dropFirst())
-        } else {
-            lines = rawLines
-        }
+        let header = rawLines.first?.lowercased()
+        let isLegacyHeader = header == "date,side"
+        let isIntervalHeader = header?.contains("start_date") == true
+        let lines: [String] = (isLegacyHeader || isIntervalHeader) ? Array(rawLines.dropFirst()) : rawLines
 
         var result: [FeedingEntry] = []
 
@@ -170,13 +168,25 @@ final class HistoryViewModel: ObservableObject {
             let parts = line.split(separator: ",", omittingEmptySubsequences: false)
                 .map { String($0).trimmingCharacters(in: .whitespaces) }
 
-            guard parts.count == 2,
-                  let date = formatter.date(from: parts[0]),
-                  let side = parseBreastSide(parts[1]) else {
-                throw CSVImportError(line: index + 1)
+            if parts.count == 2,
+               let date = formatter.date(from: parts[0]),
+               let side = parseBreastSide(parts[1]) {
+                result.append(FeedingEntry(id: UUID(), startDate: date, endDate: date, side: side))
+                continue
             }
 
-            result.append(FeedingEntry(id: UUID(), date: date, side: side))
+            if parts.count >= 3,
+               let startDate = formatter.date(from: parts[0]),
+               let endDate = formatter.date(from: parts[1]) {
+                let sideValue = parts[parts.count - 1]
+                guard let side = parseBreastSide(sideValue) else {
+                    throw CSVImportError(line: index + 1)
+                }
+                result.append(FeedingEntry(id: UUID(), startDate: startDate, endDate: endDate, side: side))
+                continue
+            }
+
+            throw CSVImportError(line: index + 1)
         }
 
         return result

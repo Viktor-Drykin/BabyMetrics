@@ -105,9 +105,12 @@ struct HistoryView: View {
                                         } label: {
                                             HStack {
                                                 VStack(alignment: .leading, spacing: 4) {
-                                                    Text(historyDateString(from: entry.date))
+                                                    Text(historyDateString(from: entry.startDate))
                                                     Text(entry.side.localizedTitle)
                                                         .font(.subheadline)
+                                                        .foregroundStyle(.secondary)
+                                                    Text(DurationTextFormatter.string(from: entry.startDate, to: entry.endDate))
+                                                        .font(.caption)
                                                         .foregroundStyle(.secondary)
                                                 }
 
@@ -262,19 +265,23 @@ struct EditFeedingView: View {
     @ObservedObject var viewModel: HistoryViewModel
     let entry: FeedingEntry
 
-    @State private var selectedDate: Date
+    @State private var selectedStartDate: Date
+    @State private var selectedEndDate: Date
     @State private var selectedSide: BreastSide
 
     init(viewModel: HistoryViewModel, entry: FeedingEntry) {
         self.viewModel = viewModel
         self.entry = entry
-        _selectedDate = State(initialValue: entry.date)
+        _selectedStartDate = State(initialValue: entry.startDate)
+        _selectedEndDate = State(initialValue: entry.endDate)
         _selectedSide = State(initialValue: entry.side)
     }
 
     var body: some View {
         Form {
-            DatePicker("Дата і час", selection: $selectedDate)
+            DatePicker("Початок", selection: $selectedStartDate)
+
+            DatePicker("Завершення", selection: $selectedEndDate, in: selectedStartDate...)
 
             Picker("Сторона", selection: $selectedSide) {
                 ForEach(BreastSide.allCases) { side in
@@ -284,7 +291,7 @@ struct EditFeedingView: View {
             .pickerStyle(.segmented)
 
             Button("Зберегти зміни") {
-                viewModel.updateEntry(id: entry.id, date: selectedDate, side: selectedSide)
+                viewModel.updateEntry(id: entry.id, startDate: selectedStartDate, endDate: selectedEndDate, side: selectedSide)
                 dismiss()
             }
             .frame(maxWidth: .infinity, alignment: .center)

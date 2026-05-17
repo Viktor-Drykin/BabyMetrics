@@ -135,7 +135,7 @@ struct CombinedTimelineView: View {
     @ViewBuilder
     private func row(for event: CombinedTimelineViewModel.EventItem) -> some View {
         switch event.kind {
-        case .feeding(let side):
+        case .feeding(let side, let duration):
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(historyDateString(from: event.date))
@@ -146,13 +146,23 @@ struct CombinedTimelineView: View {
 
                 Spacer()
 
-                Text(side.localizedTitle)
-                    .font(.caption.weight(.semibold))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(side == .left ? Color.blue.opacity(0.18) : Color.green.opacity(0.2))
-                    .foregroundStyle(side == .left ? Color.blue : Color.green)
-                    .clipShape(Capsule())
+                VStack(alignment: .trailing, spacing: 6) {
+                    Text(side.localizedTitle)
+                        .font(.caption.weight(.semibold))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(side == .left ? Color.blue.opacity(0.18) : Color.green.opacity(0.2))
+                        .foregroundStyle(side == .left ? Color.blue : Color.green)
+                        .clipShape(Capsule())
+
+                    Text(viewModel.durationString(fromSeconds: Int(duration)))
+                        .font(.caption2.weight(.semibold))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.orange.opacity(0.15))
+                        .foregroundStyle(.orange)
+                        .clipShape(Capsule())
+                }
             }
         case .sleep(let startDate, let endDate):
             VStack(alignment: .leading, spacing: 4) {

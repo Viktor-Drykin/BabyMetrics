@@ -7,44 +7,112 @@ final class RecordFeedingViewModel: ObservableObject {
     @Published var selectedSide: BreastSide = .left
     @Published var showSavedMessage = false
     @Published private(set) var entries: [FeedingEntry] = []
+    @Published private(set) var activeFeedingStart: Date?
+    @Published private(set) var activeFeedingSide: BreastSide?
+    @Published private(set) var timerNow: Date = Date()
 
     private let useCases: FeedingUseCases
+    private let timer = ActiveSessionTimer()
     private var cancellables = Set<AnyCancellable>()
 
     init(useCases: FeedingUseCases) {
         self.useCases = useCases
         entries = useCases.getEntries()
+        activeFeedingStart = useCases.getActiveFeedingStart()
+        activeFeedingSide = useCases.getActiveFeedingSide()
         selectedSide = suggestedSide(from: entries)
+        timer.setIsRunning(activeFeedingStart != nil)
 
         useCases.observeEntries()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 self?.entries = $0
-                self?.selectedSide = self?.suggestedSide(from: $0) ?? .left
+                guard let self else { return }
+                if self.activeFeedingStart == nil {
+                    self.selectedSide = self.suggestedSide(from: $0)
+                }
             }
             .store(in: &cancellables)
+
+        useCases.observeActiveFeedingStart()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.activeFeedingStart = $0
+                self?.timer.setIsRunning($0 != nil)
+            }
+            .store(in: &cancellables)
+
+        useCases.observeActiveFeedingSide()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.activeFeedingSide = $0
+            }
+            .store(in: &cancellables)
+
+        timer.$now
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.timerNow = $0
+            }
+            .store(in: &cancellables)
+    }
+
+    var isFeeding: Bool {
+        activeFeedingStart != nil
     }
 
     var lastFeedingDate: Date? {
         let now = Date()
         return entries
-            .map(\.date)
+            .map(\.endDate)
             .filter { $0 <= now }
             .max()
     }
 
+    var hasFutureFeedingEntries: Bool {
+        let now = Date()
+        return entries.contains { $0.startDate > now || $0.endDate > now }
+    }
+
+    var shouldShowLastFeedingInfo: Bool {
+        !isFeeding && !hasFutureFeedingEntries && lastFeedingDate != nil
+    }
+
+    var activeFeedingDurationText: String {
+        guard let startDate = activeFeedingStart else { return "0 хв" }
+        return DurationTextFormatter.string(from: startDate, to: timerNow)
+    }
+
     func onAppear() {
         selectedDate = Date()
-        selectedSide = suggestedSide(from: entries)
+        if !isFeeding {
+            selectedSide = suggestedSide(from: entries)
+        }
     }
 
     func onSceneBecameActive() {
         selectedDate = Date()
-        selectedSide = suggestedSide(from: entries)
+        if !isFeeding {
+            selectedSide = suggestedSide(from: entries)
+        }
     }
 
-    func saveFeeding() {
-        useCases.addEntry(todayDate(withTimeFrom: selectedDate), selectedSide)
+    func startFeeding(at customTime: Date?) {
+        guard !isFeeding else { return }
+
+        let startDate: Date
+        if let customTime {
+            startDate = todayDate(withTimeFrom: customTime)
+        } else {
+            startDate = Date()
+        }
+
+        useCases.startFeeding(startDate, selectedSide)
+    }
+
+    func stopFeeding() {
+        guard isFeeding else { return }
+        useCases.stopFeeding(Date())
         selectedSide = opposite(of: selectedSide)
         selectedDate = Date()
         showSavedMessage = true
@@ -55,33 +123,26 @@ final class RecordFeedingViewModel: ObservableObject {
     }
 
     func timeSinceString(from date: Date, to now: Date) -> String {
-        let calendar = Calendar.current
-        let safeNow = max(now, date)
-        let components = calendar.dateComponents([.day, .hour, .minute], from: date, to: safeNow)
-        let days = components.day ?? 0
-        let hours = components.hour ?? 0
-        let minutes = components.minute ?? 0
+        DurationTextFormatter.string(from: date, to: now)
+    }
 
-        var parts: [String] = []
-        if days > 0 { parts.append("\(days) д") }
-        if hours > 0 { parts.append("\(hours) год") }
-        if minutes > 0 || parts.isEmpty { parts.append("\(minutes) хв") }
-        return parts.joined(separator: " ")
+    func timeSinceMinutesString(from date: Date, to now: Date) -> String {
+        DurationTextFormatter.stringWithoutSeconds(from: date, to: now)
     }
 
     private func todayDate(withTimeFrom date: Date) -> Date {
         let calendar = Calendar.current
         let now = Date()
-        let timeComponents = calendar.dateComponents([.hour, .minute], from: date)
+        let timeComponents = calendar.dateComponents([.hour, .minute, .second], from: date)
         var todayComponents = calendar.dateComponents([.year, .month, .day], from: now)
         todayComponents.hour = timeComponents.hour
         todayComponents.minute = timeComponents.minute
-        todayComponents.second = 0
+        todayComponents.second = timeComponents.second ?? calendar.component(.second, from: now)
         return calendar.date(from: todayComponents) ?? now
     }
 
     private func suggestedSide(from entries: [FeedingEntry]) -> BreastSide {
-        guard let latestEntry = entries.max(by: { $0.date < $1.date }) else {
+        guard let latestEntry = entries.max(by: { $0.endDate < $1.endDate }) else {
             return .left
         }
         return opposite(of: latestEntry.side)

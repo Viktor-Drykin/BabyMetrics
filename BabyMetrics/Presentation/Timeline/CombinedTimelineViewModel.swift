@@ -16,7 +16,7 @@ final class CombinedTimelineViewModel: ObservableObject {
 
     struct EventItem: Identifiable {
         enum Kind {
-            case feeding(side: BreastSide)
+            case feeding(side: BreastSide, duration: TimeInterval)
             case sleep(startDate: Date, endDate: Date)
             case diaper(type: DiaperType)
         }
@@ -57,20 +57,11 @@ final class CombinedTimelineViewModel: ObservableObject {
     }
 
     func durationString(from startDate: Date, to endDate: Date) -> String {
-        let seconds = max(0, Int(endDate.timeIntervalSince(startDate)))
-        return durationString(fromSeconds: seconds)
+        DurationTextFormatter.string(from: startDate, to: endDate)
     }
 
     func durationString(fromSeconds seconds: Int) -> String {
-        let days = seconds / 86_400
-        let hours = (seconds % 86_400) / 3_600
-        let minutes = (seconds % 3_600) / 60
-
-        var parts: [String] = []
-        if days > 0 { parts.append("\(days) д") }
-        if hours > 0 { parts.append("\(hours) год") }
-        if minutes > 0 || parts.isEmpty { parts.append("\(minutes) хв") }
-        return parts.joined(separator: " ")
+        DurationTextFormatter.string(fromSeconds: seconds)
     }
 
     var daySections: [DaySection] {
@@ -113,8 +104,8 @@ final class CombinedTimelineViewModel: ObservableObject {
         let feedingItems = feedingEntries.map {
             EventItem(
                 id: "feeding-\($0.id.uuidString)",
-                date: $0.date,
-                kind: .feeding(side: $0.side)
+                date: $0.startDate,
+                kind: .feeding(side: $0.side, duration: $0.duration)
             )
         }
 
