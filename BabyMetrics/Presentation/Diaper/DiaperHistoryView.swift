@@ -87,11 +87,7 @@ struct DiaperHistoryView: View {
                             if viewModel.selectedMode == .list {
                                 List {
                                     ForEach(viewModel.filteredEntries) { entry in
-                                        NavigationLink {
-                                            EditDiaperEntryView(viewModel: viewModel, entry: entry)
-                                        } label: {
-                                            DiaperEntryRow(entry: entry, dateString: dateString(from: entry.date))
-                                        }
+                                        diaperHistoryRowLink(for: entry)
                                     }
                                     .onDelete(perform: viewModel.deleteFilteredEntries)
                                 }
@@ -104,6 +100,9 @@ struct DiaperHistoryView: View {
                                         Text("Усього: \(viewModel.filteredEntries.count)")
                                             .font(.subheadline.weight(.semibold))
                                             .foregroundStyle(.secondary)
+
+                                        diaperHistorySection
+
                                         Spacer(minLength: 36)
                                     }
                                     .padding()
@@ -149,6 +148,34 @@ struct DiaperHistoryView: View {
             actions: { Button("OK", role: .cancel) {} },
             message: { Text(viewModel.importErrorMessage ?? "Невідома помилка") }
         )
+    }
+
+    @ViewBuilder
+    private func diaperHistoryRowLink(for entry: DiaperEntry) -> some View {
+        NavigationLink {
+            EditDiaperEntryView(viewModel: viewModel, entry: entry)
+        } label: {
+            DiaperEntryRow(entry: entry, dateString: dateString(from: entry.date))
+        }
+    }
+
+    private var diaperHistorySection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Divider()
+
+            Text("Історія підгузків")
+                .font(.headline)
+
+            LazyVStack(spacing: 0) {
+                ForEach(Array(viewModel.filteredEntries.enumerated()), id: \.element.id) { index, entry in
+                    diaperHistoryRowLink(for: entry)
+
+                    if index < viewModel.filteredEntries.count - 1 {
+                        Divider()
+                    }
+                }
+            }
+        }
     }
 
     private func dateString(from date: Date) -> String {
