@@ -10,6 +10,7 @@ final class CombinedTimelineViewModel: ObservableObject {
         let sleepCount: Int
         let totalSleepDuration: TimeInterval
         let diaperCount: Int
+        let totalDiaperWeightGrams: Int
 
         var id: String { "\(date.timeIntervalSince1970)" }
     }
@@ -18,7 +19,7 @@ final class CombinedTimelineViewModel: ObservableObject {
         enum Kind {
             case feeding(side: BreastSide, duration: TimeInterval)
             case sleep(startDate: Date, endDate: Date)
-            case diaper(type: DiaperType)
+            case diaper(type: DiaperType, weightGrams: Int?)
         }
 
         let id: String
@@ -75,6 +76,7 @@ final class CombinedTimelineViewModel: ObservableObject {
                 var feedingCount = 0
                 var sleepCount = 0
                 var diaperCount = 0
+                var totalDiaperWeightGrams = 0
                 var totalSleepDuration: TimeInterval = 0
                 for event in dayEvents {
                     switch event.kind {
@@ -83,8 +85,9 @@ final class CombinedTimelineViewModel: ObservableObject {
                     case .sleep(let startDate, let endDate):
                         sleepCount += 1
                         totalSleepDuration += max(0, endDate.timeIntervalSince(startDate))
-                    case .diaper:
+                    case .diaper(_, let weightGrams):
                         diaperCount += 1
+                        totalDiaperWeightGrams += max(0, weightGrams ?? 0)
                     }
                 }
 
@@ -94,7 +97,8 @@ final class CombinedTimelineViewModel: ObservableObject {
                     feedingCount: feedingCount,
                     sleepCount: sleepCount,
                     totalSleepDuration: totalSleepDuration,
-                    diaperCount: diaperCount
+                    diaperCount: diaperCount,
+                    totalDiaperWeightGrams: totalDiaperWeightGrams
                 )
             }
             .sorted { $0.date > $1.date }
@@ -132,7 +136,7 @@ final class CombinedTimelineViewModel: ObservableObject {
             EventItem(
                 id: "diaper-\($0.id.uuidString)",
                 date: $0.date,
-                kind: .diaper(type: $0.type)
+                kind: .diaper(type: $0.type, weightGrams: $0.weightGrams)
             )
         }
 

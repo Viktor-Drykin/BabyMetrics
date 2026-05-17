@@ -80,7 +80,7 @@ struct CombinedTimelineView: View {
                                             .foregroundStyle(.primary)
 
                                         Text(
-                                            "Годувань: \(section.feedingCount) | Снів: \(section.sleepCount) | Підгузків: \(section.diaperCount) | Сон: \(viewModel.durationString(fromSeconds: Int(section.totalSleepDuration)))"
+                                            "Годувань: \(section.feedingCount) | Снів: \(section.sleepCount) | Підгузків: \(section.diaperCount) (вага: \(section.totalDiaperWeightGrams) г) | Сон: \(viewModel.durationString(fromSeconds: Int(section.totalSleepDuration)))"
                                         )
                                         .font(.subheadline.weight(.semibold))
                                         .foregroundStyle(Color.primary.opacity(0.92))
@@ -114,6 +114,9 @@ struct CombinedTimelineView: View {
                                         .font(.subheadline)
 
                                     Text("Підгузків: \(section.diaperCount)")
+                                        .font(.subheadline)
+
+                                    Text("Вага підгузків: \(section.totalDiaperWeightGrams) г")
                                         .font(.subheadline)
 
                                     Text("Загальний сон: \(viewModel.durationString(fromSeconds: Int(section.totalSleepDuration)))")
@@ -182,7 +185,7 @@ struct CombinedTimelineView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-        case .diaper(let type):
+        case .diaper(let type, _):
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(historyDateString(from: event.date))
